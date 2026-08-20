@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+*.zip
+*.tar.gz
+models/whisper-tiny/.git/
+*.pth
+.ipynb_checkpoints/

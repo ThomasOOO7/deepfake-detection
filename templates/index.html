@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modern Deepfake Detector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    .loader {
+      border-top-color: #3498db;
+      animation: spin 1s infinite linear;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white">
+  <div id="loader" class="hidden fixed inset-0 flex items-center justify-center bg-black/70 z-50">
+    <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
+  </div>
+
+  <div class="container mx-auto p-4">
+    <h1 class="text-4xl font-bold text-center my-8 bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+      AI Deepfake Detector
+    </h1>
+
+    <!-- File Upload Section -->
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
+      <input type="file" id="fileInput" class="hidden" />
+      <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-700 transition" id="dropZone">
+        <i class="fas fa-cloud-upload-alt text-5xl mb-4 text-blue-400"></i>
+        <p class="text-xl">Drag & Drop Media File</p>
+        <p class="text-gray-400 mt-2">Supports: MP4, MOV, PNG, JPG, MP3, WAV</p>
+        <button id="browseBtn" class="mt-4 px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition">
+          Browse Files
+        </button>
+      </div>
+
+      <!-- Detection Options -->
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-700 p-4 rounded-lg">
+          <input type="radio" name="detectionType" id="videoType" value="video" checked class="mr-2" />
+          <label for="videoType" class="font-medium">Video Deepfake Detection</label>
+        </div>
+        <div class="bg-gray-700 p-4 rounded-lg">
+          <input type="radio" name="detectionType" id="audioType" value="audio" class="mr-2" />
+          <label for="audioType" class="font-medium">Audio Deepfake Detection</label>
+        </div>
+        <div class="bg-gray-700 p-4 rounded-lg">
+          <input type="radio" name="detectionType" id="keywordType" value="keyword" class="mr-2" />
+          <label for="keywordType" class="font-medium">Keyword Spotting</label>
+        </div>
+      </div>
+
+      <!-- Keyword Input -->
+      <div id="keywordInput" class="mt-4 hidden">
+        <label class="block mb-2">Keywords (comma-separated):</label>
+        <input type="text" id="keywords" class="w-full bg-gray-700 rounded-lg p-2 border border-gray-600" />
+      </div>
+
+      <button id="analyzeBtn" class="w-full mt-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg hover:opacity-90 transition font-bold">
+        ANALYZE FOR DEEPFAKE
+      </button>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="bg-gray-800 p-6 rounded-xl shadow-lg hidden">
+      <h2 class="text-2xl font-bold mb-4">Detection Results</h2>
+      <div id="resultsContent"></div>
+    </div>
+  </div>
+
+  <script>
+    const loader = document.getElementById('loader');
+
+    document.getElementById("browseBtn").addEventListener("click", () => {
+      document.getElementById("fileInput").click();
+    });
+
+    document.querySelectorAll('input[name="detectionType"]').forEach(input => {
+      input.addEventListener('change', function () {
+        document.getElementById("keywordInput").style.display = this.value === "keyword" ? "block" : "none";
+      });
+    });
+
+    document.getElementById('analyzeBtn').addEventListener('click', async () => {
+      const fileInput = document.getElementById('fileInput');
+      if (!fileInput.files.length) return alert("Please select a file!");
+
+      const detectionType = document.querySelector('input[name="detectionType"]:checked').value;
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('type', detectionType);
+
+      if (detectionType === 'keyword') {
+        const keywords = document.getElementById('keywords').value;
+        if (!keywords.trim()) return alert("Enter keywords!");
+        formData.append('keywords', keywords);
+      }
+
+      loader.classList.remove('hidden');
+      document.getElementById('results').classList.add('hidden');
+      document.getElementById('analyzeBtn').innerHTML = 'ANALYZING...';
+
+      const endpoint = detectionType === 'keyword' ? '/api/transcribe' : '/api/detect';
+      const response = await fetch(endpoint, { method: 'POST', body: formData });
+
+      const result = await response.json();
+      displayResults(result, detectionType);
+      document.getElementById('analyzeBtn').innerHTML = 'ANALYZE FOR DEEPFAKE';
+      loader.classList.add('hidden');
+    });
+
+    function displayResults(data, type) {
+      const resultsDiv = document.getElementById('resultsContent');
+      resultsDiv.innerHTML = '';
+
+      if (data.error) {
+        resultsDiv.innerHTML = `<div class="text-red-500 font-bold">${data.error}</div>`;
+      } else if (type === 'video' || type === 'image') {
+        const isFake = data.verdict === 'Fake';
+        resultsDiv.innerHTML = `
+          <div class="mb-6 p-4 rounded-lg ${isFake ? 'bg-red-900/30 border-l-4 border-red-500' : 'bg-green-900/30 border-l-4 border-green-500'}">
+            <h3 class="text-xl font-bold mb-2">${isFake ? '⚠ FAKE CONTENT DETECTED' : '✅ GENUINE CONTENT'}</h3>
+            <p>Confidence: <span class="font-bold">${(data.confidence * 100).toFixed(2)}%</span></p>
+          </div>`;
+      } else if (type === 'audio') {
+        resultsDiv.innerHTML = `
+          <div class="mb-4 p-4 rounded-lg ${data.verdict === 'Fake' ? 'bg-red-900/30' : 'bg-green-900/30'}">
+            <h3 class="text-xl font-bold">Audio Verdict: ${data.verdict}</h3>
+            <p>Confidence: ${(data.confidence * 100).toFixed(2)}%</p>
+          </div>`;
+      } else if (type === 'keyword') {
+        let keywordsHTML = data.matches.map(match => `
+          <div class="flex justify-between py-2 border-b border-gray-700">
+            <span>${match.keyword}</span>
+            <span>${match.start.toFixed(2)}s</span>
+          </div>
+        `).join('');
+
+        resultsDiv.innerHTML = `
+          <div class="mb-4">
+            <h3 class="text-xl font-bold mb-2">Keyword Matches</h3>
+            <div class="max-h-60 overflow-y-auto">${keywordsHTML}</div>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold mb-2">Full Transcription</h3>
+            <p class="bg-gray-700 p-3 rounded-lg whitespace-pre-wrap">${data.transcription}</p>
+          </div>`;
+      }
+
+      document.getElementById('results').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
