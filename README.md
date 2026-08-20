@@ -34,11 +34,14 @@ The application separates the **web interface** from the **AI detection model**,
 ## 🖥️ Demo
 
 ### Home Page
+<img width="817" height="558" alt="image" src="https://github.com/user-attachments/assets/98dcbb17-fced-4ee3-a952-35535ade1cf3" />
 
 
 
 ### Detection Result
+<img width="705" height="562" alt="image" src="https://github.com/user-attachments/assets/7461ad77-208b-4b86-bcff-d5baffbead4d" />
 
+<img width="608" height="550" alt="image" src="https://github.com/user-attachments/assets/3c3e7def-4a9b-4dca-b4fe-b6d1ead0bb4e" />
 
 
 ---
@@ -46,45 +49,9 @@ The application separates the **web interface** from the **AI detection model**,
 ## 🏗️ Architecture
 
 ```text
-                    ┌─────────────────┐
-                    │      User       │
-                    └────────┬────────┘
-                             │
-                             ▼
-                  ┌─────────────────────┐
-                  │    Web Frontend     │
-                  │    HTML/CSS/JS      │
-                  └──────────┬──────────┘
-                             │
-                       Upload File
-                             │
-                             ▼
-                  ┌─────────────────────┐
-                  │    Flask Backend    │
-                  │   File Processing   │
-                  └──────────┬──────────┘
-                             │
-                        API Request
-                             │
-                             ▼
-                  ┌─────────────────────┐
-                  │  Detection API      │
-                  │      /api/detect    │
-                  └──────────┬──────────┘
-                             │
-                             ▼
-                  ┌─────────────────────┐
-                  │   AI/ML Detection   │
-                  │       Model         │
-                  └──────────┬──────────┘
-                             │
-                     REAL / FAKE
-                             │
-                             ▼
-                  ┌─────────────────────┐
-                  │   Result Display    │
-                  └─────────────────────┘
-```
+<img width="791" height="439" alt="image" src="https://github.com/user-attachments/assets/c6de68f2-d600-4b44-b43f-e70a95b2a63e" />
+
+<img width="998" height="600" alt="image" src="https://github.com/user-attachments/assets/dc75dc5f-c1f3-4840-8968-f8ff44884aab" />
 
 ---
 
@@ -95,7 +62,7 @@ The application separates the **web interface** from the **AI detection model**,
 * HTML5
 * CSS3
 * JavaScript
-* Bootstrap / Custom CSS
+
 
 ### Backend
 
@@ -198,7 +165,7 @@ REAL / FAKE
 ## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/deepfake-detection.git
+git clone https://github.com/ThomasOOO7/deepfake-detection.git
 ```
 
 ```bash
@@ -233,21 +200,9 @@ pip install -r requirements.txt
 
 ---
 
-## 4. Configure the Model API
 
-Set the API endpoint in your Flask application.
 
-Example:
-
-```python
-MODEL_API_URL = "http://127.0.0.1:8000/api/detect"
-```
-
-If your model is hosted remotely, replace it with the deployed API URL.
-
----
-
-## 5. Start the Application
+## 4. Start the Application
 
 ```bash
 python app.py
