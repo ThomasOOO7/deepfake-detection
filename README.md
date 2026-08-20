@@ -48,7 +48,7 @@ The application separates the **web interface** from the **AI detection model**,
 
 ## 🏗️ Architecture
 
-```text
+
 <img width="791" height="439" alt="image" src="https://github.com/user-attachments/assets/c6de68f2-d600-4b44-b43f-e70a95b2a63e" />
 
 <img width="998" height="600" alt="image" src="https://github.com/user-attachments/assets/dc75dc5f-c1f3-4840-8968-f8ff44884aab" />
